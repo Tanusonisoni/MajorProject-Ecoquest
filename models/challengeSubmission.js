@@ -1,17 +1,16 @@
-
-import {Schema,model} from "mongoose";
+import { Schema, model } from "mongoose";
 
 const challengeSubmissionSchema = new Schema(
   {
     challengeId: {
       type: Schema.Types.ObjectId,
-      ref: "challenge",
+      ref: "Challenge", // actual Challenge model name se match karna chahiye
       required: true
     },
 
     studentId: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "user", // actual User model name se match karna chahiye
       required: true
     },
 

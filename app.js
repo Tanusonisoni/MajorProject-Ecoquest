@@ -3,12 +3,13 @@ import express from "express";
 import logger from "morgan";
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
-import  adminRoutes from "./routes/lessonRoute.js"
+import adminRoutes from "./routes/lessonRoute.js"
 import quizRoute from "./routes/quizRoute.js"
 import challangeRouter from "./routes/challangeRoute.js"
 import submissionRoutes from "./routes/submissionRoutes.js"
 import userRoute from "./routes/userRoute.js";
 import authRoute from "./routes/authRoute.js"
+import adminCheckSubmission from "./routes/adminCheckSubmission.js"
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use('/admin',adminRoutes);
 app.use('/quiz',quizRoute);
 app.use('/challange',challangeRouter);
 app.use('/student',submissionRoutes);
+app.use('/submissionCheck',adminCheckSubmission)
 
 
 

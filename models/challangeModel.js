@@ -1,5 +1,5 @@
 
-import {model,Schema} from "mongoose";
+import { model, Schema } from "mongoose";
 
 const challengeSchema = new Schema(
     {
@@ -25,8 +25,16 @@ const challengeSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ["draft", "published"],
-            default: "draft"
+            enum: ["pending", "approved", "rejected"],
+            default: "pending"
+        },
+        marks: {
+            type: Number,
+            default: 0
+        },
+        feedback: {
+            type: String,
+            default: ""
         },
         createdBy: {
             type: Schema.Types.ObjectId,

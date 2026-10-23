@@ -1,6 +1,5 @@
 
 import challengeModel from "../models/challangeModel.js";
-import ChallengeSubmission from "../models/ChallengeSubmission.js";
 import cloudinary from "../Config/cloudinary.js";
 import {ApiResponse} from "../utils/resPattern.js";
 
