@@ -43,3 +43,64 @@ export async function getAllSubmissions(req, res, next) {
     next(error);
 }
 }
+
+export async function reviewSubmission(req, res, next) {
+
+    console.log("REVIEW SUBMISSION CONTROLLER HIT");
+    
+    try {
+        const { status, marks, feedback } = req.body;
+        const { submissionId } = req.params;
+
+        // Validate status
+        if (!["approved", "rejected"].includes(status)) {
+            return res.status(400).json(
+                new ApiResponse(
+                    false,
+                    null,
+                    "Status must be approved or rejected"
+                )
+            );
+        }
+
+        // Validate marks
+        if (
+            marks !== undefined &&
+            (!Number.isFinite(Number(marks)) || Number(marks) < 0)
+        ) {
+            return res.status(400).json(
+                new ApiResponse(false, null, "Marks must be a non-negative number")
+            );
+        }
+
+        const submission = await ChallengeSubmission.findById(submissionId);
+
+        if (!submission) {
+            return res.status(404).json(
+                new ApiResponse(false, null, "Submission not found")
+            );
+        }
+
+        submission.status = status;
+
+        if (marks !== undefined) {
+            submission.marks = Number(marks);
+        }
+
+        if (feedback !== undefined) {
+            submission.feedback = feedback;
+        }
+
+        await submission.save();
+
+        return res.status(200).json(
+            new ApiResponse(
+                true,
+                submission,
+                "Submission reviewed successfully"
+            )
+        );
+    } catch (error) {
+        next(error);
+    }
+}

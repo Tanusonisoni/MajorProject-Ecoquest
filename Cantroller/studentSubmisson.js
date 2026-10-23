@@ -2,6 +2,7 @@
 import challengeModel from "../models/challangeModel.js";
 import cloudinary from "../Config/cloudinary.js";
 import {ApiResponse} from "../utils/resPattern.js";
+import ChallengeSubmission from "../models/challengeSubmission.js";
 
 function uploadProof(file) {
   return new Promise((resolve, reject) => {
@@ -80,5 +81,19 @@ export async function submitChallengeProof(req, res, next) {
     );
   } catch (error) {
     next(error);
+  }
+}
+
+export async function getMySubmissions(req,res,next){
+  try{
+    const  studentId=req.user._id;
+
+    const submission=await ChallengeSubmission.find({studentId})
+    .populate("challengeId","title description")
+    .sort({createdAt:-1});
+
+    return res.status(200).json(new ApiResponse(true,submission,"your submission fetched successfully"));
+  }catch(error){
+    return res.status(500).json(new ApiResponse(false,null,error.message || "internal server error"));
   }
 }
