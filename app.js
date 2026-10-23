@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import  adminRoutes from "./routes/lessonRoute.js"
 import quizRoute from "./routes/quizRoute.js"
+import challangeRouter from "./routes/challangeRoute.js"
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.get("/",(req,res)=>{
 
 app.use('/admin',adminRoutes);
 app.use('/quiz',quizRoute);
+app.use('/challange',challangeRouter);
 
 
 

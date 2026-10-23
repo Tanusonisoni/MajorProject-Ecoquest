@@ -1,4 +1,4 @@
-import lessonModel from "../models/LessonModel.js";
+import lessonModel from "../models/lessonModel.js";
 import { ApiResponse } from "../utils/resPattern.js";
 
 
