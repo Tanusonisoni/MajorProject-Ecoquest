@@ -12,6 +12,9 @@ import authRoute from "./routes/authRoute.js"
 import adminCheckSubmission from "./routes/adminCheckSubmission.js"
 import quizResultRoute from "./routes/quizResultRoute.js"
 import studentDashboard from "./routes/studentDashboardRoute.js"
+import leaderboard from "./routes/leaderboardRoute.js"
+import profile from "./routes/profileRoute.js";
+import AdminDashboard  from './routes/adminDashboardRoute.js';
 
 const app = express();
 
@@ -37,8 +40,10 @@ app.use('/challange',challangeRouter);
 app.use('/student',submissionRoutes);
 app.use('/submissionCheck',adminCheckSubmission)
 app.use("/quiz-result", quizResultRoute);
-app.use("/dashboard",studentDashboard)
-
+app.use("/dashboard",studentDashboard);
+app.use("/leaderboard", leaderboard);
+app.use("/profile",profile);
+app.use("/adminDashboard",AdminDashboard)
 
 
 
