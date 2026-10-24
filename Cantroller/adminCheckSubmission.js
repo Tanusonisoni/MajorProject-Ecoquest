@@ -2,6 +2,8 @@
 import ChallengeSubmission from "../models/challengeSubmission.js";
 import { ApiResponse } from "../utils/resPattern.js";
 import notificationModel from "../models/notificationModel.js";
+import { emitLeaderboardUpdate } from "../utils/emitLeaderboardUpdate.js";
+
 
 export async function getAllSubmissions(req, res, next) {
 
@@ -94,6 +96,13 @@ export async function reviewSubmission(req, res, next) {
 
         await submission.save();
 
+        //socketio integrate
+
+        // Update leaderboard in real time
+        const io = req.app.get("io");
+        await emitLeaderboardUpdate(io);
+
+
         // Create notification for the student
         await notificationModel.create({
             userId: submission.studentId,
@@ -106,6 +115,20 @@ export async function reviewSubmission(req, res, next) {
             type: "challenge_review",
             isRead: false
         });
+
+        if (io) {
+            io.emit("notification:new", {
+                userId: submission.studentId,
+                title: status === "approved"
+                    ? "Challenge Approved"
+                    : "Challenge Rejected",
+                message: status === "approved"
+                    ? "Your challenge submission has been approved."
+                    : "Your challenge submission has been rejected.",
+                type: "challenge_review",
+                isRead: false
+            });
+        }
 
         return res.status(200).json(
             new ApiResponse(

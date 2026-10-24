@@ -3,7 +3,8 @@ import http from "http";
 import app from "../app.js";
 import debuger from "debug";
 import connectDb from "../Config/db.js";
-import dotenv from "dotenv"
+import dotenv from "dotenv";
+import {Server} from "socket.io";
 
 const debug=debuger('eco-quest:server');
 dotenv.config();
@@ -26,6 +27,22 @@ app.set('port', port);
 
 const server = http.createServer(app);
 
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL,
+    methods: ["GET", "POST"]
+  }
+});
+
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
+});
 /**
  * Listen on provided port, on all network interfaces.
  */

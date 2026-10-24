@@ -2,6 +2,7 @@
 import Quiz from "../models/quizModel.js";
 import quizResultModel from "../models/quizResult.js";
 import { ApiResponse } from "../utils/resPattern.js";
+import { emitLeaderboardUpdate } from "../utils/emitLeaderboardUpdate.js";
 
 export async function submitQuizAttempt(req, res, next) {
     try {
@@ -94,6 +95,9 @@ export async function submitQuizAttempt(req, res, next) {
             score,
             totalMarks: quiz.questions.length * 5
         });
+
+        const io = req.app.get("io");
+        await emitLeaderboardUpdate(io);
 
         return res.status(201).json(
             new ApiResponse(
