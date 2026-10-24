@@ -33,10 +33,11 @@ export async function getStudentProfile(req, res, next) {
 }
 
 // Update logged-in student's name
+
 export async function updateStudentProfile(req, res, next) {
     try {
         const studentId = req.user?._id || req.user?.id;
-        const { name } = req.body;
+        const { name, email } = req.body;
 
         if (!studentId) {
             return res.status(401).json(
@@ -44,15 +45,42 @@ export async function updateStudentProfile(req, res, next) {
             );
         }
 
-        if (typeof name !== "string" || !name.trim()) {
+        const updateData = {};
+
+        // Name validation
+        if (name !== undefined) {
+            if (typeof name !== "string" || !name.trim()) {
+                return res.status(400).json(
+                    new ApiResponse(false, null, "Valid name is required")
+                );
+            }
+
+            updateData.name = name.trim();
+        }
+
+        // Email validation
+        if (email !== undefined) {
+            if (
+                typeof email !== "string" ||
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+            ) {
+                return res.status(400).json(
+                    new ApiResponse(false, null, "Invalid email")
+                );
+            }
+
+            updateData.email = email.trim().toLowerCase();
+        }
+
+        if (Object.keys(updateData).length === 0) {
             return res.status(400).json(
-                new ApiResponse(false, null, "Valid name is required")
+                new ApiResponse(false, null, "Provide name or email to update")
             );
         }
 
         const student = await userModel.findOneAndUpdate(
             { _id: studentId, role: "student" },
-            { $set: { name: name.trim() } },
+            { $set: updateData },
             { new: true, runValidators: true }
         ).select("name email role status createdAt");
 
@@ -66,6 +94,13 @@ export async function updateStudentProfile(req, res, next) {
             new ApiResponse(true, student, "Profile updated successfully")
         );
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(409).json(
+                new ApiResponse(false, null, "Email already exists")
+            );
+        }
+
         next(error);
     }
 }
+
