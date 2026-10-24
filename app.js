@@ -15,8 +15,33 @@ import studentDashboard from "./routes/studentDashboardRoute.js"
 import leaderboard from "./routes/leaderboardRoute.js"
 import profile from "./routes/profileRoute.js";
 import AdminDashboard  from './routes/adminDashboardRoute.js';
+import helmet from "helmet";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 
 const app = express();
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message: "Too many requests. Please try again later."
+  }
+});
+
+//security header
+app.use(helmet());
+
+app.use(cors({
+  origin:process.env.CLIENT_URL,
+  methods:["GET","POST","PUT","PATCH","DELETE"],
+  allowedHeaders:["content-type","Authorization"]
+}))
+
+app.use(apiLimiter);
 
 app.use(logger('dev'));
 app.use(express.json());
