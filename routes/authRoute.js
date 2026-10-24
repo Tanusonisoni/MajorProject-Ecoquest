@@ -6,7 +6,7 @@ import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router=Router();
 
-router.post("/login",authMiddleware,authCantroller);
-router.post("/admin-login",adminMiddleware,adminMiddleware,authCantroller)
+router.post("/login",authCantroller);
+router.post("/admin-login",authCantroller)
 
 export default router;

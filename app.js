@@ -14,6 +14,7 @@ import quizResultRoute from "./routes/quizResultRoute.js"
 import studentDashboard from "./routes/studentDashboardRoute.js"
 import leaderboard from "./routes/leaderboardRoute.js"
 import profile from "./routes/profileRoute.js";
+import notification from "./routes/notificationRoute.js"
 import AdminDashboard  from './routes/adminDashboardRoute.js';
 import helmet from "helmet";
 import cors from "cors";
@@ -69,6 +70,7 @@ app.use("/dashboard",studentDashboard);
 app.use("/leaderboard", leaderboard);
 app.use("/profile",profile);
 app.use("/adminDashboard",AdminDashboard)
+app.use("/notification",notification)
 
 
 

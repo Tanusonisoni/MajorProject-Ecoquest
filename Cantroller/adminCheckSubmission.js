@@ -1,6 +1,7 @@
 
 import ChallengeSubmission from "../models/challengeSubmission.js";
 import { ApiResponse } from "../utils/resPattern.js";
+import notificationModel from "../models/notificationModel.js";
 
 export async function getAllSubmissions(req, res, next) {
 
@@ -39,15 +40,15 @@ export async function getAllSubmissions(req, res, next) {
             )
         );
     } catch (error) {
-    console.error("Get All Submissions Error:", error);
-    next(error);
-}
+        console.error("Get All Submissions Error:", error);
+        next(error);
+    }
 }
 
 export async function reviewSubmission(req, res, next) {
 
     console.log("REVIEW SUBMISSION CONTROLLER HIT");
-    
+
     try {
         const { status, marks, feedback } = req.body;
         const { submissionId } = req.params;
@@ -92,6 +93,19 @@ export async function reviewSubmission(req, res, next) {
         }
 
         await submission.save();
+
+        // Create notification for the student
+        await notificationModel.create({
+            userId: submission.studentId,
+            title: status === "approved"
+                ? "Challenge Approved"
+                : "Challenge Rejected",
+            message: status === "approved"
+                ? "Your challenge submission has been approved."
+                : "Your challenge submission has been rejected.",
+            type: "challenge_review",
+            isRead: false
+        });
 
         return res.status(200).json(
             new ApiResponse(
