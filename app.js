@@ -60,7 +60,7 @@ app.get("/",(req,res)=>{
 
 app.use('/auth',authRoute);
 app.use('/user',userRoute);
-app.use('/admin',adminRoutes);
+app.use('/lesson',adminRoutes);
 app.use('/quiz',quizRoute);
 app.use('/challange',challangeRouter);
 app.use('/student',submissionRoutes);
@@ -72,6 +72,20 @@ app.use("/profile",profile);
 app.use("/adminDashboard",AdminDashboard)
 app.use("/notification",notification)
 
+
+app.use((err, req, res, next) => {
+  console.error("ERROR MESSAGE:", err.message);
+  console.error("ERROR DETAILS:", err);
+
+  if (err.http_code) {
+    console.error("CLOUDINARY HTTP CODE:", err.http_code);
+  }
+
+  res.status(err.status || err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
 
 
 

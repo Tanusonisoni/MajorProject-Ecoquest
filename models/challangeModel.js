@@ -25,8 +25,8 @@ const challengeSchema = new Schema(
         },
         status: {
             type: String,
-            enum: ["pending", "approved", "rejected"],
-            default: "pending"
+            enum: ["draft", "published"],
+            default: "draft"
         },
         marks: {
             type: Number,

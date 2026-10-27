@@ -4,13 +4,14 @@ import cloudinary from "../Config/cloudinary.js";
 
 export async function createChallange(req,res,next){
     try{
-        const {title,description,lessonId,instructions,status}=req.body;
+        const {title,description,lessonId,instructions,status,marks}=req.body;
 
         if(!title || !description || !lessonId || !instructions){
             return res.status(400).json(new ApiResponse(false,null,"all fields are required"));
         }
         const challenge= await challengeModel.create({
-            title,description,lessonId,instructions,status
+            title,description,lessonId,instructions,status,marks,
+            createdBy: req.user?._id
         });
 
         return res.status(201).json(new ApiResponse(true,challenge,"challenge create successfully"))
@@ -20,19 +21,30 @@ export async function createChallange(req,res,next){
 }
 export async function getAllChallenge(req,res,next) {
     try{
-        let page=req.query.page > 0 ? req.query.page :1;
-        let limit=req.query.limit <= 100 ? req.query.limit : 25
-        let skip = page===1 ? 0 :(page-1)*limit;
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 25));
+        const skip = (page - 1) * limit;
 
-        let challenge = await challengeModel.find()
-        .populate("createdBy","name email role_id")
-        .skip(skip)
-        .limit(limit)
-        .sort({createdAt:-1});
+        const filter = req.user?.role === "admin" ? {} : { status: "published" };
+        const [challenge, totalChallenge] = await Promise.all([
+            challengeModel.find(filter)
+                .populate("createdBy", "name email")
+                .populate("lessonId", "title topic")
+                .skip(skip)
+                .limit(limit)
+                .sort({ createdAt: -1 }),
+            challengeModel.countDocuments(filter)
+        ]);
 
-        let totalChallenge=await challengeModel.countDocuments();
-
-        res.status(200).json(new ApiResponse(true,{page,limit,totalChallenge,challenge},"success"));
+        res.status(200).json(new ApiResponse(true, {
+            challenge,
+            pagination: {
+                total: totalChallenge,
+                page,
+                limit,
+                totalPages: Math.ceil(totalChallenge / limit)
+            }
+        }, "Challenges fetched successfully"));
 
     }catch(error)
     {
@@ -42,8 +54,12 @@ export async function getAllChallenge(req,res,next) {
 
 export  async function getchallengeById(req,res,next){
     try{
-        const challange=await challengeModel.findById(req.params.id);
+        const challange=await challengeModel.findById(req.params.id)
+            .populate("lessonId", "title topic");
         if(!challange) return res.status(404).json(new ApiResponse(false,null,"challenge not found"));
+        if (req.user?.role !== "admin" && challange.status !== "published") {
+            return res.status(404).json(new ApiResponse(false,null,"challenge not found"));
+        }
 
         return res.status(200).json(new ApiResponse(true,challange,"find successfully"));
 

@@ -19,7 +19,7 @@ export function verifytoken(token){
         return tokenData;
     }
     catch(error){
-        consolelog(error);
+        console.log(error);
         return false;
     }
 }

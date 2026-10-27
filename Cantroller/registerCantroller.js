@@ -81,15 +81,27 @@ export async function registerUser(req, res, next) {
 
 export async function getAllUsers(req,res,next){
     try{
-        let page=req.query.page > 0 ? req.query.page:1;
-        let limit = req.query.limit<=100? req.query.limit:25;
-        let skip=page===1 ? 0 : (page-1)*limit;
+        const page = Math.max(1, Number(req.query.page) || 1);
+        const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 25));
+        const skip = (page - 1) * limit;
+        const [users, total] = await Promise.all([
+            userModel.find({ role: "student" })
+                .select("-password")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            userModel.countDocuments({ role: "student" })
+        ]);
 
-        let users=await userModel.find({role:"user"})
-            .skip(skip)
-            .limit(limit);
-
-        res.status(200).json(new ApiResponse(true,users,"success"))
+        res.status(200).json(new ApiResponse(true, {
+            users,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        }, "Students fetched successfully"))
     }
 
     catch(error)
@@ -99,7 +111,7 @@ export async function getAllUsers(req,res,next){
 }
 export async function getUserById(req,res,next){
     try{
-        let user=await userModel.findById(req.params.id);
+        let user=await userModel.findById(req.params.id).select("-password");
          if(!user)
          {
             return res.status(404).json(new ApiResponse(false,null,"user not found"))
@@ -192,14 +204,16 @@ export async function updateUser(req, res, next) {
 
 export async function deleteUser(req, res, next) {
     try {
-        let user = await userModel.findByIdAndUpdate(req.user._id, { isDeleted: true }, { returnDocument: "after" });
+        if (req.params.id === String(req.user?._id)) {
+            return res.status(400).json(new ApiResponse(false, null, "You cannot delete your own account"));
+        }
+        let user = await userModel.findByIdAndDelete(req.params.id);
         if (!user) return res.status(404).json(new ApiResponse(false, null, "user not found"));
 
-        res.status(200).json(new ApiResponse(true, user, "user deleted successfully!"));
+        res.status(200).json(new ApiResponse(true, { id: user._id }, "user deleted successfully!"));
 
     } catch (error) {
         res.status(500).json(new ApiResponse(false, error.message || "internal server error"));
 
     }
 }
-

@@ -30,7 +30,7 @@ export default async function authMiddleware(req, res, next) {
             );
         }
 
-        if (user.isActive === false) {
+        if (user.status && user.status !== "active") {
             return res.status(403).json(
                 new ApiResponse(false, null, "Account is inactive")
             );

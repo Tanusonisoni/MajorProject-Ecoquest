@@ -77,7 +77,7 @@ export async function submitQuizAttempt(req, res, next) {
                 answer.selectedAnswer === question.correctAnswer;
 
             if (isCorrect) {
-                score += 5;
+                score += question.points;
             }
 
             checkedAnswers.push({
@@ -87,13 +87,18 @@ export async function submitQuizAttempt(req, res, next) {
             });
         }
 
+        const totalMarks = quiz.questions.reduce(
+            (total, question) => total + question.points,
+            0
+        );
+
         const result = await quizResultModel.create({
             quizId: quiz._id,
             lessonId: quiz.lessonId,
             studentId,
             answers: checkedAnswers,
             score,
-            totalMarks: quiz.questions.length * 5
+            totalMarks
         });
 
         const io = req.app.get("io");
@@ -105,7 +110,7 @@ export async function submitQuizAttempt(req, res, next) {
                 {
                     quizId: quiz._id,
                     score,
-                    totalMarks: quiz.questions.length * 5,
+                    totalMarks,
                     correctAnswers: checkedAnswers.filter(
                         answer => answer.isCorrect
                     ).length,
