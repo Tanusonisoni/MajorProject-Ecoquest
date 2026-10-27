@@ -1,5 +1,5 @@
 import { ApiResponse } from "../utils/resPattern.js";
-import lessonModel from "../models/lessonModel.js"
+import lessonModel from "../models/LessonModel.js"
 import cloudinary from "../Config/cloudinary.js";
 
 // export async function uploadLessonVideo(req, res, next) {
