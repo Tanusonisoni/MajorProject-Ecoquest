@@ -1,7 +1,7 @@
 
 import QuizResult from "../models/quizResult.js";
 import ChallengeSubmission from "../models/challengeSubmission.js";
-import Lesson from "../models/lessonModel.js";
+import Lesson from "../models/LessonModel.js";
 import { ApiResponse } from "../utils/resPattern.js";
 
 export async function getStudentDashboard(req, res, next) {
