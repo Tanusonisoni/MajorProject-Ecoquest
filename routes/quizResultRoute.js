@@ -1,6 +1,6 @@
 import express from "express";
 import authMiddleware from "../middleware/authMiddleware.js";
-import { submitQuizAttempt } from "../Cantroller/submitquizAttempt.js";
+import { submitQuizAttempt } from "../Cantroller/submitQuizAttempt.js";
 
 const router = express.Router();
 
