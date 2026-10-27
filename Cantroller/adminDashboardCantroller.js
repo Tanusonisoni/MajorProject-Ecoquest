@@ -1,5 +1,5 @@
 
-import lessonModel from "../models/lessonModel.js";
+import lessonModel from "../models/LessonModel.js";
 import quizModel from "../models/quizModel.js";
 import challangeModel from "../models/challangeModel.js";
 import userModel from "../models/userModel.js";

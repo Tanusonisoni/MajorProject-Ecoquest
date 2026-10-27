@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node api.js && node ./bin/www",
-    "dev": "node api.js && node --watch ./bin/www"
+    "start": "node init && node ./bin/www",
+    "dev": "node init && node --watch ./bin/www"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
